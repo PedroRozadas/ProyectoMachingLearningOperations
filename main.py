@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 import pandas as pd
-import numpy as np
+# import numpy as np
 
 def url_set(url: str):
     return 'https://drive.google.com/uc?id=' + url.split('/')[-2]
@@ -12,6 +12,7 @@ dic_url = {"amazon_prime": url_set("https://drive.google.com/file/d/1LJIYUiPnFbU
             "disney_plus": url_set("https://drive.google.com/file/d/1d8BTVBj3NmCxUMknTkVcuVRWwVhXthiP/view?usp=share_link"),
            "hulu": url_set("https://drive.google.com/file/d/1Sy7HMCQgVlT31CAD2ewXrN82jMlsK21s/view?usp=share_link"),
            "netflix": url_set("https://drive.google.com/file/d/1yQ44qjfACWsR66lb-D_tDCmmDxPnIXvm/view?usp=share_link")}
+
 
 df_names = pd.DataFrame()
 
@@ -51,8 +52,12 @@ df_names[cols] = df_names[cols].apply(lambda x: x.str.lower())
 df_duration = df_names["duration"].str.split(" ", n=1, expand=True)
 
 # assign the resulting columns to duration_int and duration_type respectively
-df_names["duration_int"] = np.where(df_names["duration"].notnull(), df_duration[0], np.nan)
-df_names["duration_type"] = np.where(df_names["duration"].notnull(), df_duration[1], np.nan)
+df_names["duration_int"] = df_duration[0].apply(lambda x: x if pd.notnull(x) else None)
+
+df_names["duration_type"] = df_duration[1].apply(lambda x: x if pd.notnull(x) else None)
+
+# df_names["duration_int"] = np.where(df_names["duration"].notnull(), df_duration[0], np.nan)
+# df_names["duration_type"] = np.where(df_names["duration"].notnull(), df_duration[1], np.nan)
 
 df_names["duration_int"] = df_names["duration_int"].astype(pd.UInt16Dtype())
 

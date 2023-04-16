@@ -1,37 +1,15 @@
 from fastapi import FastAPI
 import pandas as pd
-# import numpy as np
 
-def url_set(url: str):
-    return 'https://drive.google.com/uc?id=' + url.split('/')[-2]
-
-def generate_id(show_id, platform):
-    return platform[0] + show_id
-
-dic_url = {"amazon_prime": url_set("https://drive.google.com/file/d/1LJIYUiPnFbU0mOKQMW54QZPPq1bAd5Zc/view?usp=share_link"),
-            "disney_plus": url_set("https://drive.google.com/file/d/1d8BTVBj3NmCxUMknTkVcuVRWwVhXthiP/view?usp=share_link"),
-           "hulu": url_set("https://drive.google.com/file/d/1Sy7HMCQgVlT31CAD2ewXrN82jMlsK21s/view?usp=share_link"),
-           "netflix": url_set("https://drive.google.com/file/d/1yQ44qjfACWsR66lb-D_tDCmmDxPnIXvm/view?usp=share_link")}
-
-
-df_names = pd.DataFrame()
-
-for key, value in dic_url.items():
-    # Get CSV file from Google Drive without downloading it
-    df = pd.read_csv(value)
-    df["id"] = df["show_id"].apply(lambda x: generate_id(x, key))
-    df_names = pd.concat([df_names, df])
-
-df_names.reset_index(drop=True, inplace=True)
-
-list_url = [url_set("https://drive.google.com/file/d/1ImYbz29myZKGDZCYY4r5yzXWcdPqp-DL/view?usp=share_link"),
-        url_set("https://drive.google.com/file/d/1rlpHWaxvo5kX5hyyOP7i5zpC5V9RfsaV/view?usp=share_link"),
-        url_set("https://drive.google.com/file/d/1CBZA4xkDhfa-CX8dr92rhjKR3HhgctzE/view?usp=share_link"),
-        url_set("https://drive.google.com/file/d/1CsaTyLVB-AZ78yJp9XeSw2qvTSNj9aYx/view?usp=share_link"),
-        url_set("https://drive.google.com/file/d/1QztUrbE6CEC57AgbNcR9XJf9WIvwUF3P/view?usp=share_link"),
-        url_set("https://drive.google.com/file/d/1y0TKNdKhSumjjaDSUGQTPIlMZuFqy1Zn/view?usp=share_link"),
-        url_set("https://drive.google.com/file/d/18WgvpsLVK_5uhCJm5HyZSytNreOIRiT1/view?usp=share_link"),
-        url_set("https://drive.google.com/file/d/1dwqAfTL7BXbOvJn_A3bwQkL9_gbIFoTz/view?usp=share_link")]
+df_names = pd.read_csv('https://drive.google.com/uc?id=1z3-83_I7ZfHrxbB0qC2gAzz0AfgZH7GI')
+list_url = ["https://drive.google.com/uc?id=1ImYbz29myZKGDZCYY4r5yzXWcdPqp-DL",
+            "https://drive.google.com/uc?id=1rlpHWaxvo5kX5hyyOP7i5zpC5V9RfsaV",
+            "https://drive.google.com/uc?id=1CBZA4xkDhfa-CX8dr92rhjKR3HhgctzE",
+            "https://drive.google.com/uc?id=1CsaTyLVB-AZ78yJp9XeSw2qvTSNj9aYx",
+            "https://drive.google.com/uc?id=1QztUrbE6CEC57AgbNcR9XJf9WIvwUF3P",
+            "https://drive.google.com/uc?id=1y0TKNdKhSumjjaDSUGQTPIlMZuFqy1Zn",
+            "https://drive.google.com/uc?id=18WgvpsLVK_5uhCJm5HyZSytNreOIRiT1",
+            "https://drive.google.com/uc?id=1dwqAfTL7BXbOvJn_A3bwQkL9_gbIFoTz"]
 
 #Merging multiple csv files into a single dataframe
 df_ratings = pd.concat(map(pd.read_csv, list_url))
@@ -56,25 +34,19 @@ df_names["duration_int"] = df_duration[0].apply(lambda x: x if pd.notnull(x) els
 
 df_names["duration_type"] = df_duration[1].apply(lambda x: x if pd.notnull(x) else None)
 
-# df_names["duration_int"] = np.where(df_names["duration"].notnull(), df_duration[0], np.nan)
-# df_names["duration_type"] = np.where(df_names["duration"].notnull(), df_duration[1], np.nan)
-
 df_names["duration_int"] = df_names["duration_int"].astype(pd.UInt16Dtype())
-
 
 app = FastAPI()
 
 @app.get('/get_max_duration/{anio}/{plataforma}/{dtype}')
 def get_max_duration(anio: int, plataforma: str, dtype: str):
     selection = df_names.query('type == "movie" and release_year == @anio and duration_type == @dtype and id.str[0] == @plataforma[0]')
-    # selection = df_names[(df_names["type"] == "movie") & (df_names["release_year"] == anio) & (df_names["duration_type"] == dtype) & (df_names["id"].str[0] == plataforma[0])]
     return {'pelicula': selection.loc[selection["duration_int"].idxmax(), "title"]}
 
 @app.get('/get_score_count/{plataforma}/{scored}/{anio}')
 def get_score_count(plataforma: str, scored: float, anio: int):
     selection_name = df_names.query('type == "movie" and release_year == @anio and id.str[0] == @plataforma[0]')
     selection_rating = df_ratings.query('movieId in @selection_name["id"].values and rating > @scored')
-    # selection = df_names[(df_names["type"] == "movie") & (df_names["release_year"] == anio) & (df_names["id"].str[0] == plataforma[0])]
     return {
         'plataforma': plataforma,
         'cantidad': selection_rating["movieId"].unique().shape[0],

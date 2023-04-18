@@ -4,6 +4,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
 df_names = pd.read_csv('df_platform.csv')
+df_ml = pd.read_csv('df_ml.csv')
 
 app = FastAPI()
 
@@ -57,12 +58,12 @@ def get_recomendation(title):
     top=5
     vectorizer = TfidfVectorizer()
     #Construct the required TF-IDF matrix by fitting and transforming the data
-    vectorizer_matrix = vectorizer.fit_transform(df_names['listed_in'])
-
+    vectorizer_matrix = vectorizer.fit_transform(df_ml['listed_in'])
+    
     #Compute the cosine similarity matrix
     cosine_sim = cosine_similarity(vectorizer_matrix)
     #Get the index of the movie that matches the title
-    idx = df_names[df_names['title'] == title].index[0]
+    idx = df_ml[df_ml['title'] == title].index[0]
 
     #Get the cosine similarity scores of all movies with the given movie
     sim_scores = list(enumerate(cosine_sim[idx]))
@@ -75,10 +76,10 @@ def get_recomendation(title):
     count = 0
     while len(movie_indices) < top:
         idx = sim_scores[count][0]
-        if df_names.iloc[idx]['title'] != title: #Exclude the same movie
+        if df_ml.iloc[idx]['title'] != title: #Exclude the same movie
             movie_indices.append(idx)
         count += 1
-    a = list(df_names.iloc[movie_indices]['title'].values)
+    a = list(df_ml.iloc[movie_indices]['title'].values)
     
     #Return the top n most similar movies
     return {'recomendacion': a}

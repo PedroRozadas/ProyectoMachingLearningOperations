@@ -70,13 +70,13 @@ def get_recomendation(title):
     sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)
     
     #Loop until we have 5 recommended movies (excluding itself)
-    # movie_indices = []
-    # count = 0
-    # while len(movie_indices) < 5:
-    #     idx = sim_scores[count][0]
-    #     if df_ml.iloc[idx]['title'] != title: #Exclude the same movie
-    #         movie_indices.append(idx)
-    #     count += 1
+    movie_indices = []
+    count = 0
+    while len(movie_indices) < 5:
+        idx = sim_scores[count][0]
+        if df_ml.iloc[idx]['title'] != title: #Exclude the same movie
+            movie_indices.append(idx)
+        count += 1
     a = list(df_ml.iloc[movie_indices]['title'].values)
     
     #Return the top n most similar movies

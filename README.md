@@ -1,17 +1,6 @@
-# ProyectoMachingLearningOperations
-Machine Learning project that contemplates from data processing and collection (Data Engineer) to training and maintenance of the ML model as new data arrives. For this we are given 4 datasets from different streaming platforms, amazon, disney, hulu, netflix and 8 datasets containing the rating/score that certain users did.
-# Objectives:
-ETL transformations:
-Generate id column: Each id will consist of the first letter of the platform name, followed by the show_id already present in the datasets.
-
-Null values in the rating field must be replaced by the string "G".
-
-Dates must be in the format YYYYY-mm-dd.
-
-Text fields should be in lower case.
-
-The duration column must be converted into two columns: duration_int and duration_type.
-API development:
+# Proyect Maching Learning Operations.
+Machine Learning project that contemplates from data processing and collection (Data Engineer) to training and maintenance of the ML model as new data arrives. For this purpose, I was given 4 datasets from different streaming platforms, amazon, disney, hulu, netflix and 8 datasets containing the rating/score that certain users did.
+# API development:
 The function get_max_duration(year, platform, duration_type) returns only the movie name string. The movie (only movie, not series, etc) with the longest duration according to year, platform and duration type. 
 
 The function get_score_count(platform, scored, year) returns an int, with the total number of movies that meet the request. The number of movies (only movies, not series, etc) by platform, with a score greater than XX in a given year. 
@@ -36,13 +25,18 @@ The main.py file has the functions to be instantiated by FastAPI.
 The requirements.txt file has the names of the libraries used for the deploy.
 # Tools and languages used.
 Visual Studio Code.
+
 Git.
+
 FastAPI.
+
 Render.
+
 Python.
 # Links
 Drive con los datasets:
 https://drive.google.com/drive/folders/1f-wDJLGXNbYHJF5DRXRzOcUn_MW3ohbj?usp=share_link
+
 Video explicativo de la API:
 
 Deploy de la API en Render:

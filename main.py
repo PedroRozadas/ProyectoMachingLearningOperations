@@ -3,7 +3,7 @@ import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
-df_names = pd.read_csv('https://drive.google.com/uc?id=1jW-R0mTe748Kj7UdNwwLn70pqmZJts_3')
+df_names = pd.read_csv('df_platform.csv')
 
 app = FastAPI()
 
@@ -52,12 +52,32 @@ def get_contents(rating: str):
     contents = df_names.query('rating == @rating')
     return {'rating': rating, 'contenido': contents.shape[0]}
 
+vectorizer = TfidfVectorizer()
+#Construct the required TF-IDF matrix by fitting and transforming the data
+vectorizer_matrix = vectorizer.fit_transform(df_names['listed_in'])
+
+#Compute the cosine similarity matrix
+cosine_sim = cosine_similarity(vectorizer_matrix)
+
 @app.get('/get_recomendation/{title}')
-def get_recomendation(title):
-    vectorizer = TfidfVectorizer()
-    vectorizer_matrix = vectorizer.fit_transform(df_names["listed_in"]) #Learn vocabulary and idf, return document-term matrix.
-    # vectorizer.get_feature_names_out()
-    cosine_sim = cosine_similarity(vectorizer_matrix)
-    matching_content = sorted(list(enumerate(cosine_sim[10])), key=lambda x: x[1], reverse=True)
-    top_matching = [i[0] for i in matching_content[1:6]]
-    return {'recomendacion': df_names["title"].iloc[top_matching]}
+def get_recomendation(title, cosine_sim=cosine_sim, df_names=df_names, top=5):
+    #Get the index of the movie that matches the title
+    idx = df_names[df_names['title'] == title].index[0]
+
+    #Get the cosine similarity scores of all movies with the given movie
+    sim_scores = list(enumerate(cosine_sim[idx]))
+
+    #Sort the movies based on the cosine similarity scores
+    sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)
+    
+    #Loop until we have 5 recommended movies (excluding itself)
+    movie_indices = []
+    count = 0
+    while len(movie_indices) < top:
+        idx = sim_scores[count][0]
+        if df_names.iloc[idx]['title'] != title: #Exclude the same movie
+            movie_indices.append(idx)
+        count += 1
+    
+    #Return the top n most similar movies
+    return {'recomendacion': df_names.iloc[movie_indices]['title'].values}

@@ -1,5 +1,5 @@
 # ProyectoMachingLearningOperations
-To do this we are given 4 datasets from different streaming platforms, amazon, disney, hulu, netflix and 8 datasets containing the rating/score that certain users made.
+Machine Learning project that contemplates from data processing and collection (Data Engineer) to training and maintenance of the ML model as new data arrives. For this we are given 4 datasets from different streaming platforms, amazon, disney, hulu, netflix and 8 datasets containing the rating/score that certain users did.
 # Objectives:
 ETL transformations:
 Generate id column: Each id will consist of the first letter of the platform name, followed by the show_id already present in the datasets.

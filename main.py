@@ -56,7 +56,7 @@ def get_contents(rating: str):
 def get_recomendation(title):
     vectorizer = TfidfVectorizer()
     #Construct the required TF-IDF matrix by fitting and transforming the data
-    vectorizer_matrix = vectorizer.fit_transform(df_ml['listed_in'])
+    vectorizer_matrix = vectorizer.fit_transform(df_ml['title'])
     
     #Compute the cosine similarity matrix
     cosine_sim = cosine_similarity(vectorizer_matrix)

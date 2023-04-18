@@ -28,7 +28,6 @@ The function get_contents(rating) returns the total number of contents with that
 The .gitignore file has the content that ignores the git push.
 
 In the notebook ETL_EDA_ML.ipynb I perform the ETL, EDA and ML processes.
-check
 
 The file df_platform.csv is the dataset after the ETL and EDA to be consumed with the FastAPI.
 

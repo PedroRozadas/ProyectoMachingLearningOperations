@@ -14,11 +14,10 @@ def get_max_duration(anio: int, plataforma: str, dtype: str):
 
 @app.get('/get_score_count/{plataforma}/{scored}/{anio}')
 def get_score_count(plataforma: str, scored: float, anio: int):
-    selection_name = df_names.query('type == "movie" and release_year == @anio and id.str[0] == @plataforma[0]')
-    selection_rating = df_ratings.query('movieId in @selection_name["id"].values and scored > @scored')
+    selection_name = df_names.query('type == "movie" and release_year == @anio and id.str[0] == @plataforma[0] and scored == @scored')
     return {
         'plataforma': plataforma,
-        'cantidad': selection_rating["movieId"].unique().shape[0],
+        'cantidad': selection_name["id"].nunique(),
         'anio': anio,
         'score': scored
     }
@@ -79,6 +78,7 @@ def get_recomendation(title):
         if df_names.iloc[idx]['title'] != title: #Exclude the same movie
             movie_indices.append(idx)
         count += 1
+    a = list(df_names.iloc[movie_indices]['title'].values)
     
     #Return the top n most similar movies
-    return {'recomendacion': df_names.iloc[movie_indices]['title'].values}
+    return {'recomendacion': a}

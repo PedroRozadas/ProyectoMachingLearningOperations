@@ -41,6 +41,6 @@ Drive con los datasets:
 https://drive.google.com/drive/folders/1f-wDJLGXNbYHJF5DRXRzOcUn_MW3ohbj?usp=share_link
 
 Video explicativo de la API:
-
+https://youtu.be/RbXuFjBTWpA
 Deploy de la API en Render:
 https://entertainment-recommendation.onrender.com/Docs

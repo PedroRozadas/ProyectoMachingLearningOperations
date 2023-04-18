@@ -11,9 +11,9 @@ The function get_actor(platform, year) returns only the string with the name of 
 
 The function prod_per_county(type,country,year) returns the amount of contents/products according to the type of content (movie,series) by country and year in a dictionary with variables named 'country' (country name), 'year' (year), 'movie' (amount of contents/products).
 
-the function get_recommendation(title: str) returns a Python list with 5 values, each one being the string of the name of the movies with the highest score, in descending order.
-
 The function get_contents(rating) returns the total number of contents with that audience rating (for which audience the movie was rated).
+
+the function get_recommendation(title: str) returns a Python list with 5 values, each one being the string of the name of the movies with the highest score, in descending order.
 # Repository content:
 
 The .gitignore file has the content that ignores the git push.

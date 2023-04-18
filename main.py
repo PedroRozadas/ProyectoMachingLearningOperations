@@ -52,8 +52,7 @@ def get_contents(rating: str):
     contents = df_names.query('rating == @rating')
     return {'rating': rating, 'contenido': contents.shape[0]}
 
-
-# Precompute the vectorizer and cosine similarity matrix
+@app.get('/get_recomendation/{title}')
 def get_recomendation(title):
     vectorizer = TfidfVectorizer()
     #Construct the required TF-IDF matrix by fitting and transforming the data

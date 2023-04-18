@@ -14,6 +14,7 @@ The function prod_per_county(type,country,year) returns the amount of contents/p
 The function get_contents(rating) returns the total number of contents with that audience rating (for which audience the movie was rated).
 
 the function get_recommendation(title: str) returns a Python list with 5 values, each one being the string of the name of the movies with the highest score, in descending order.
+
 # Repository content:
 
 The .gitignore file has the content that ignores the git push.

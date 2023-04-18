@@ -52,15 +52,16 @@ def get_contents(rating: str):
     contents = df_names.query('rating == @rating')
     return {'rating': rating, 'contenido': contents.shape[0]}
 
-vectorizer = TfidfVectorizer()
-#Construct the required TF-IDF matrix by fitting and transforming the data
-vectorizer_matrix = vectorizer.fit_transform(df_names['listed_in'])
-
-#Compute the cosine similarity matrix
-cosine_sim = cosine_similarity(vectorizer_matrix)
 
 @app.get('/get_recomendation/{title}')
-def get_recomendation(title, cosine_sim=cosine_sim, df_names=df_names, top=5):
+def get_recomendation(title):
+    top=5
+    vectorizer = TfidfVectorizer()
+    #Construct the required TF-IDF matrix by fitting and transforming the data
+    vectorizer_matrix = vectorizer.fit_transform(df_names['listed_in'])
+
+    #Compute the cosine similarity matrix
+    cosine_sim = cosine_similarity(vectorizer_matrix)
     #Get the index of the movie that matches the title
     idx = df_names[df_names['title'] == title].index[0]
 

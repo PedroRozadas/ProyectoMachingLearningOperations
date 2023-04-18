@@ -2,6 +2,8 @@ from fastapi import FastAPI
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
+import heapq
+import numpy as np
 
 df_names = pd.read_csv('df_platform.csv')
 df_ml = pd.read_csv('df_ml.csv')
@@ -53,33 +55,30 @@ def get_contents(rating: str):
     return {'rating': rating, 'contenido': contents.shape[0]}
 
 
+# Precompute the vectorizer and cosine similarity matrix
+vectorizer = TfidfVectorizer()
+vectorizer_matrix = vectorizer.fit_transform(df_ml['listed_in'])
+cosine_sim = cosine_similarity(vectorizer_matrix)
 @app.get('/get_recomendation/{title}')
-def get_recomendation(title):
-    top=5
-    vectorizer = TfidfVectorizer()
-    #Construct the required TF-IDF matrix by fitting and transforming the data
-    vectorizer_matrix = vectorizer.fit_transform(df_ml['listed_in'])
-    
-    #Compute the cosine similarity matrix
-    cosine_sim = cosine_similarity(vectorizer_matrix)
-    #Get the index of the movie that matches the title
+def get_recommendation(title, top=5):
+    # Get the index of the movie that matches the title
     idx = df_ml[df_ml['title'] == title].index[0]
 
-    #Get the cosine similarity scores of all movies with the given movie
+    # Get the cosine similarity scores of all movies with the given movie
     sim_scores = list(enumerate(cosine_sim[idx]))
 
-    #Sort the movies based on the cosine similarity scores
-    sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)
-    
-    #Loop until we have 5 recommended movies (excluding itself)
+    # Keep only the top `top` elements at any given time
+    top_sim_scores = heapq.nlargest(top, sim_scores, key=lambda x: x[1])
+
+    # Loop until we have `top` recommended movies (excluding itself)
     movie_indices = []
-    count = 0
-    while len(movie_indices) < top:
-        idx = sim_scores[count][0]
+    for idx, sim_score in top_sim_scores:
         if df_ml.iloc[idx]['title'] != title: #Exclude the same movie
             movie_indices.append(idx)
-        count += 1
+
+    # Use numpy to get the titles of the recommended movies
+    movie_indices = np.array(movie_indices)
     a = list(df_ml.iloc[movie_indices]['title'].values)
-    
-    #Return the top n most similar movies
+
+    # Return the top `top` most similar movies
     return {'recomendacion': a}

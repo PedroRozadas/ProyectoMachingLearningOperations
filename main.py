@@ -1,40 +1,9 @@
 from fastapi import FastAPI
 import pandas as pd
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 
-df_names = pd.read_csv('https://drive.google.com/uc?id=1z3-83_I7ZfHrxbB0qC2gAzz0AfgZH7GI')
-list_url = ["https://drive.google.com/uc?id=1ImYbz29myZKGDZCYY4r5yzXWcdPqp-DL",
-            "https://drive.google.com/uc?id=1rlpHWaxvo5kX5hyyOP7i5zpC5V9RfsaV",
-            "https://drive.google.com/uc?id=1CBZA4xkDhfa-CX8dr92rhjKR3HhgctzE",
-            "https://drive.google.com/uc?id=1CsaTyLVB-AZ78yJp9XeSw2qvTSNj9aYx",
-            "https://drive.google.com/uc?id=1QztUrbE6CEC57AgbNcR9XJf9WIvwUF3P",
-            "https://drive.google.com/uc?id=1y0TKNdKhSumjjaDSUGQTPIlMZuFqy1Zn",
-            "https://drive.google.com/uc?id=18WgvpsLVK_5uhCJm5HyZSytNreOIRiT1",
-            "https://drive.google.com/uc?id=1dwqAfTL7BXbOvJn_A3bwQkL9_gbIFoTz"]
-
-#Merging multiple csv files into a single dataframe
-df_ratings = pd.concat(map(pd.read_csv, list_url))
-
-df_ratings.reset_index(drop=True, inplace=True)
-
-df_names["rating"] = df_names["rating"].fillna("G")
-
-df_names["date_added"] = df_names["date_added"].str.strip()
-df_names["date_added"] = pd.to_datetime(df_names["date_added"], format="%B %d, %Y")
-
-df_ratings["timestamp"] = pd.to_datetime(df_ratings["timestamp"], unit="s")
-
-cols = ["type", "title", "director", "cast", "country", "listed_in", "description", "rating"]
-df_names[cols] = df_names[cols].apply(lambda x: x.str.lower())
-
-# split duration into two separate columns
-df_duration = df_names["duration"].str.split(" ", n=1, expand=True)
-
-# assign the resulting columns to duration_int and duration_type respectively
-df_names["duration_int"] = df_duration[0].apply(lambda x: x if pd.notnull(x) else None)
-
-df_names["duration_type"] = df_duration[1].apply(lambda x: x if pd.notnull(x) else None)
-
-df_names["duration_int"] = df_names["duration_int"].astype(pd.UInt16Dtype())
+df_names = pd.read_csv('https://drive.google.com/uc?id=1jW-R0mTe748Kj7UdNwwLn70pqmZJts_3')
 
 app = FastAPI()
 
@@ -46,7 +15,7 @@ def get_max_duration(anio: int, plataforma: str, dtype: str):
 @app.get('/get_score_count/{plataforma}/{scored}/{anio}')
 def get_score_count(plataforma: str, scored: float, anio: int):
     selection_name = df_names.query('type == "movie" and release_year == @anio and id.str[0] == @plataforma[0]')
-    selection_rating = df_ratings.query('movieId in @selection_name["id"].values and rating > @scored')
+    selection_rating = df_ratings.query('movieId in @selection_name["id"].values and scored > @scored')
     return {
         'plataforma': plataforma,
         'cantidad': selection_rating["movieId"].unique().shape[0],
@@ -76,14 +45,19 @@ def get_actor(plataforma: str, anio: int):
 @app.get('/prod_per_county/{tipo}/{pais}/{anio}')
 def prod_per_county(tipo: str, pais: str, anio: int):
     products = df_names.query('release_year == @anio and type == @tipo and country == @pais')
-    return {'pais': pais, 'anio': anio, 'peliculas': products.shape[0]}
+    return {'pais': pais, 'anio': anio, 'contenido': products.shape[0]}
 
 @app.get('/get_contents/{rating}')
 def get_contents(rating: str):
     contents = df_names.query('rating == @rating')
     return {'rating': rating, 'contenido': contents.shape[0]}
 
-# @app.get('/get_recomendation/{title}')
-# def get_recomendation(title,):
-    
-#     return {'recomendacion':respuesta}
+@app.get('/get_recomendation/{title}')
+def get_recomendation(title):
+    vectorizer = TfidfVectorizer()
+    vectorizer_matrix = vectorizer.fit_transform(df_names["listed_in"]) #Learn vocabulary and idf, return document-term matrix.
+    # vectorizer.get_feature_names_out()
+    cosine_sim = cosine_similarity(vectorizer_matrix)
+    matching_content = sorted(list(enumerate(cosine_sim[10])), key=lambda x: x[1], reverse=True)
+    top_matching = [i[0] for i in matching_content[1:6]]
+    return {'recomendacion': df_names["title"].iloc[top_matching]}

@@ -20,7 +20,14 @@ for key, value in dic_url.items():
     df_names = pd.concat([df_names, df])
 
 df_names.reset_index(drop=True, inplace=True)
-
+# list_url = ["https://drive.google.com/uc?id=1ImYbz29myZKGDZCYY4r5yzXWcdPqp-DL",
+#             "https://drive.google.com/uc?id=1rlpHWaxvo5kX5hyyOP7i5zpC5V9RfsaV",
+#             "https://drive.google.com/uc?id=1CBZA4xkDhfa-CX8dr92rhjKR3HhgctzE",
+#             "https://drive.google.com/uc?id=1CsaTyLVB-AZ78yJp9XeSw2qvTSNj9aYx",
+#             "https://drive.google.com/uc?id=1QztUrbE6CEC57AgbNcR9XJf9WIvwUF3P",
+#             "https://drive.google.com/uc?id=1y0TKNdKhSumjjaDSUGQTPIlMZuFqy1Zn",
+#             "https://drive.google.com/uc?id=18WgvpsLVK_5uhCJm5HyZSytNreOIRiT1",
+#             "https://drive.google.com/uc?id=1dwqAfTL7BXbOvJn_A3bwQkL9_gbIFoTz"]
 list_url = [url_set("https://drive.google.com/file/d/1ImYbz29myZKGDZCYY4r5yzXWcdPqp-DL/view?usp=share_link"),
         url_set("https://drive.google.com/file/d/1rlpHWaxvo5kX5hyyOP7i5zpC5V9RfsaV/view?usp=share_link"),
         url_set("https://drive.google.com/file/d/1CBZA4xkDhfa-CX8dr92rhjKR3HhgctzE/view?usp=share_link"),
@@ -54,3 +61,14 @@ df_names["duration_type"] = df_duration[1].apply(lambda x: x if pd.notnull(x) el
 
 df_names["duration_int"] = df_names["duration_int"].astype(pd.UInt16Dtype())
 
+df_names.to_csv("df_names.csv")
+
+four = len(df_ratings) // 4
+df1 = df_ratings.iloc[:four]
+df2 = df_ratings.iloc[four:four + four]
+df3 = df_ratings.iloc[four + four:four + four + four]
+df4 = df_ratings.iloc[four + four + four:]
+df1.to_csv("df1.csv")
+df2.to_csv("df2.csv")
+df3.to_csv("df3.csv")
+df4.to_csv("df4.csv")

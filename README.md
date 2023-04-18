@@ -1,5 +1,5 @@
 # Proyect Maching Learning Operations.
-Machine Learning project that contemplates from data processing and collection (Data Engineer) to training and maintenance of the ML model as new data arrives. For this purpose, I was given 4 datasets from different streaming platforms, amazon, disney, hulu, netflix and 8 datasets containing the rating/score that certain users did.
+Machine Learning project that includes from the processing and data collection (Data Engineer) to the training and maintenance of the ML model of movie recommendation. For this I was provided with 4 datasets from different streaming platforms, amazon, disney, hulu, netflix and 8 datasets containing the rating/scoring made by certain users.
 # API development:
 The function get_max_duration(year, platform, duration_type) returns only the movie name string. The movie (only movie, not series, etc) with the longest duration according to year, platform and duration type. 
 
